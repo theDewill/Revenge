@@ -13,17 +13,31 @@ type SSEprotocol interface {
 	Emit(c echo.Context) error
 }
 
-type UpdateMessage struct {
+type UpdateMessage struct { // Implementations - [ SSEprotocol ]
 	Msg   string
 	Type  string
 	Data  interface{}
 	Event string
 }
 
+type TempMessage struct {
+	MsgType string
+	Msg     string
+}
+
+func (tm *TempMessage) Emit(c echo.Context) error {
+	c.Response().WriteHeader(http.StatusOK)
+
+	message := fmt.Sprintf("type: %s\n Msg: %s\n", tm.MsgType, tm.Msg)
+	if _, err := c.Response().Write([]byte(message)); err != nil {
+		return err
+	}
+	c.Response().Flush()
+	return nil
+}
+
 func (su *UpdateMessage) Emit(c echo.Context) error {
-	c.Response().Header().Set(echo.HeaderContentType, "text/event-stream")
-	c.Response().Header().Set(echo.HeaderCacheControl, "no-cache")
-	c.Response().Header().Set("Connection", "keep-alive")
+
 	c.Response().WriteHeader(http.StatusOK)
 
 	message := fmt.Sprintf("event: %s\ndata: %s\n\n", su.Event, su.Msg)
