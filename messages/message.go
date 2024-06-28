@@ -13,6 +13,12 @@ type SSEprotocol interface {
 	Emit(c echo.Context) error
 }
 
+type ViewMessage struct {
+	action       string `json:"action"`
+	component    string `json:"component"`
+	update_value string `json:"update_value"`
+}
+
 type UpdateMessage struct { // Implementations - [ SSEprotocol ]
 	Msg   string
 	Type  string
