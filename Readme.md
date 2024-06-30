@@ -1,4 +1,3 @@
-Here's a sample README file for your Golang SSE web server project. This README includes basic sections such as an introduction, installation instructions, usage details, and additional notes that might be helpful for someone trying to understand or contribute to your project.
 
 ---
 
