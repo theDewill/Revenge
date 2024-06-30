@@ -10,6 +10,9 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
+// user egistry - [global]
+var user_registry *registries.UserRegistry = registries.NewUserRegitry()
+
 func initSSE(c echo.Context) error {
 
 	c.Response().Header().Set(echo.HeaderContentType, "text/event-stream")
@@ -21,15 +24,15 @@ func initSSE(c echo.Context) error {
 
 	//TODO: here extract the userid from JWT and create an entry in the user registry
 
+	//keep alive msg repeater block
 	for {
 		select {
 		case <-ticker.C:
 			// Example: Emit an event every 5 seconds
 			sendMsg := messages.TempMessage{
-				Msg:     "Hello, this is a periodic message!",
-				MsgType: "periodic",
+				Msg:  "Hello, this is a periodic message!",
+				Type: "periodic",
 			}
-
 			if err := sendMsg.Emit(c); err != nil {
 				return err
 			}
@@ -42,8 +45,6 @@ func initSSE(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-
-	user_registry := registries.NewUserRegitry()
 
 	//add - cron task to release the resgistri every day at 12pm [ midday ]
 	c := cron.New()
