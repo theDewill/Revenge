@@ -2,10 +2,12 @@ package main
 
 import (
 	"ssego/messages"
+	"ssego/registries"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/robfig/cron/v3"
 )
 
 func initSSE(c echo.Context) error {
@@ -16,6 +18,8 @@ func initSSE(c echo.Context) error {
 
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
+
+	//TODO: here extract the userid from JWT and create an entry in the user registry
 
 	for {
 		select {
@@ -38,6 +42,19 @@ func initSSE(c echo.Context) error {
 
 func main() {
 	e := echo.New()
+
+	user_registry := registries.NewUserRegitry()
+
+	//add - cron task to release the resgistri every day at 12pm [ midday ]
+	c := cron.New()
+	_, err := c.AddFunc("0 0 12 * * *", func() { // Cron expression for every day at 12:00 PM
+		user_registry.Release()
+	})
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+	c.Start()
+	defer c.Stop()
 
 	// Middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

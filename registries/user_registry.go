@@ -1,4 +1,4 @@
-package uregistry
+package registries
 
 import (
 	"ssego/messages"
