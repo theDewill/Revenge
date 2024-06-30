@@ -3,6 +3,7 @@
 package messages
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -20,21 +21,26 @@ type ViewMessage struct {
 }
 
 type UpdateMessage struct { // Implementations - [ SSEprotocol ]
-	Msg   string
-	Type  string
-	Data  interface{}
-	Event string
+	Msg   string      `json:"msg"`
+	Type  string      `json:"type"`
+	Data  interface{} `json:"data"`
+	Event string      `json:"event"`
 }
 
 type TempMessage struct {
-	MsgType string
-	Msg     string
+	Type string `json:"msgType"`
+	Msg  string `json:"msg"`
 }
 
 func (tm *TempMessage) Emit(c echo.Context) error {
+
 	c.Response().WriteHeader(http.StatusOK)
 
-	message := fmt.Sprintf("type: %s\n Msg: %s\n", tm.MsgType, tm.Msg)
+	msgJson, err := json.Marshal(tm)
+	if err != nil {
+		fmt.Println("Error in marshalling json")
+	}
+	message := fmt.Sprintf("data: {\"jsonContent\": %s}\n\nevent: %s\n\n", string(msgJson), tm.Type)
 	if _, err := c.Response().Write([]byte(message)); err != nil {
 		return err
 	}
@@ -46,7 +52,12 @@ func (su *UpdateMessage) Emit(c echo.Context) error {
 
 	c.Response().WriteHeader(http.StatusOK)
 
-	message := fmt.Sprintf("event: %s\ndata: %s\n\n", su.Event, su.Msg)
+	msgJson, err := json.Marshal(su)
+	if err != nil {
+		fmt.Println("Error in marshalling json")
+	}
+
+	message := fmt.Sprintf("data: {\"jsonContent\": %s}\n\nevent: %s\n\n", string(msgJson), su.Type)
 	if _, err := c.Response().Write([]byte(message)); err != nil {
 		return err
 	}
