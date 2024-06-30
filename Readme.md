@@ -72,5 +72,3 @@ Nomin Sendinu - nsendinu@gmail.com
 Project Link: [https://github.com/theDewill/SSEbridge](https://github.com/theDewill/SSEbridge)
 
 ---
-
-This README is structured to give a clear overview of your project and how to get involved. Adjust the links, project name, and contact details to match your actual project's details.

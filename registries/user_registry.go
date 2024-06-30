@@ -30,6 +30,12 @@ func NewUserRegitry() *UserRegistry {
 	return &ureg
 }
 
+func (ureg *UserRegistry) Release() {
+	ureg.muLock.Lock()
+	defer ureg.muLock.Unlock()
+	ureg.sse_map = make(map[string]echo.Context)
+}
+
 // TODO: implment more structures usr type without user id like here | 2nd phase
 // mutext has applied in case haver to use go routines in future over uRegistry..
 func (ureg *UserRegistry) AddUser(user string, sseContext echo.Context) {
