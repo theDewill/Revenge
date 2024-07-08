@@ -18,6 +18,9 @@ type Server struct {
 	Res  *echo.Echo
 }
 
+type Portion struct {
+}
+
 //TODO: this will be added to the revenge once server pool and load balncer is placed
 
 type RevengeRoot struct {
