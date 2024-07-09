@@ -1,10 +1,10 @@
 
 ---
 
-# Golang SSE Bridge
+# Revenge
 
 ## Introduction
-This project implements a Server-Sent Events (SSE) web server in Go, using the Echo framework. It features a custom message struct for efficiently managing messages and a user registry for storing user context. Additionally, the server utilizes scheduled tasks to maintain and flush user records daily.
+This project implements a Complete Backend Infrastruture Framework in Golang with the ability to deploy Single to Multi system Dsitributed services via Runners and Built in Channel Network Registry with GrPc services for fast communication between Different Runner operated via a Central Revenge Server with features like (GraphQL,Rest,SSE,webSockets,Https and lot more architectures to choose from),. It features a custom message struct for efficiently managing messages and a user registry for storing user context. Additionally, the server utilizes scheduled tasks to maintain and flush user records daily.
 
 ## Features
 - **SSE Support**: Real-time communication with clients using Server-Sent Events.
