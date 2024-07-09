@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package channel;
+
+// The message structure
+option go_package = "ssego/pb";
+
+
+message Message {
+  string content = 1;
+}
+
+// The service definition
+service ChannelService {
+  rpc SendMessage(Message) returns (Message);
+}
