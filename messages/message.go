@@ -14,6 +14,7 @@ type SSEprotocol interface {
 	Emit(c echo.Context) error
 }
 
+// Message Items [2]
 type ViewMessage struct {
 	action       string `json:"action"`
 	component    string `json:"component"`

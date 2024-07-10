@@ -18,6 +18,8 @@ type Server struct {
 	Res  *echo.Echo
 }
 
+type Runner struct{}
+
 type Portion struct {
 }
 
@@ -42,7 +44,7 @@ func New(port string) *RevengeRoot {
 
 func (RV *RevengeRoot) Commence() {
 
-	_, err := RV.task_manger.AddFunc("0 0 12 * * *", func() { // Cron expression for every day at 12:00 PM
+	_, err := RV.task_manger.AddFunc("0 12 * * *", func() { // Cron expression for every day at 12:00 PM
 		RV.user_registry.Release()
 	})
 	if err != nil {
@@ -59,7 +61,7 @@ func (RV *RevengeRoot) Commence() {
 	}))
 
 	//Rest Point
-	RV.server.Res.GET("/startconnection", SSEhandler)
+	RV.server.Res.GET("/stconn", SSEhandler)
 	RV.server.Res.Logger.Fatal(RV.server.Res.Start(":" + RV.server.port))
 }
 
