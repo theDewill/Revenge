@@ -1,6 +1,8 @@
 package Revenge
 
 import (
+	"fmt"
+	"net/http"
 	"ssego/messages"
 	"ssego/registries"
 	"time"
@@ -10,6 +12,22 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/robfig/cron/v3"
 )
+
+// RV injector to the SSEhandler
+func GenerateCustomDataMiddleware(RV *RevengeRoot) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			// Store it in the context
+			c.Set("RVOBJ", RV)
+
+			//TODO: this is temp and remove this
+			c.Set("ugrpid", 1)
+			c.Set("uid", 1)
+			// Call the next handler in the chain
+			return next(c)
+		}
+	}
+}
 
 // user egistry - [global]
 
@@ -53,6 +71,8 @@ func (RV *RevengeRoot) Commence() {
 	RV.task_manger.Start()
 	defer RV.task_manger.Stop()
 
+	RV.server.Res.Use(GenerateCustomDataMiddleware(RV))
+
 	RV.server.Res.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
@@ -62,7 +82,34 @@ func (RV *RevengeRoot) Commence() {
 
 	//Rest Point
 	RV.server.Res.GET("/stconn", SSEhandler)
+
+	RV.server.Res.GET("/testUpdate", test_handler)
+
 	RV.server.Res.Logger.Fatal(RV.server.Res.Start(":" + RV.server.port))
+}
+
+func Web_Socket() interface{} {
+
+}
+
+func test_handler(c echo.Context) error {
+	//performing db operations - chanign the state of DB
+	new_entry := "Hello World" // new entry
+	UR := c.Get("RVOBJ").(RevengeRoot).user_registry
+
+	msg := &messages.UpdateMessage{
+		Msg:        "Hello, this is a periodic test msg!",
+		Type:       "periodic",
+		Data:       "new entry",
+		Event:      "new_entry",
+		Action:     "insert",
+		Dependents: "none",
+		Component:  "none",
+	}
+
+	UR.SendUpdates(1, 1, msg)
+
+	return c.JSON(http.StatusOK, new_entry)
 }
 
 func SSEhandler(c echo.Context) error {
@@ -74,18 +121,37 @@ func SSEhandler(c echo.Context) error {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
-	//TODO: here extract the userid from JWT and create an entry in the user registry
+	fmt.Println("SSE handler called")
+
+	//TODO: here extract the userid from JWT and create an entry in the user registry]
+
+	var RV *RevengeRoot = c.Get("RVOBJ").(*RevengeRoot)
+
+	tmp_user := RV.user_registry.LoadUser(c.Get("ugrpid").(int), c.Get("uid").(int))
+
+	fmt.Printf("passsed loading phase")
 
 	//keep alive msg repeater block
 	for {
 		select {
+
+		//SSE activator function
+		case message := <-tmp_user.Sse_channel:
+			fmt.Println("Message Received for other users")
+			c.Response().WriteHeader(http.StatusOK)
+			if _, err := c.Response().Write([]byte(message.(string))); err != nil {
+				return err
+			}
+			c.Response().Flush()
+
 		case <-ticker.C:
 			// Example: Emit an event every 5 seconds
+			fmt.Println("Message sent for temp")
 			sendMsg := messages.TempMessage{
 				Msg:  "Hello, this is a periodic message!",
 				Type: "periodic",
 			}
-			if err := sendMsg.Emit(c); err != nil {
+			if err := sendMsg.EmitTmp(c); err != nil {
 				return err
 			}
 		case <-c.Request().Context().Done():
