@@ -88,10 +88,6 @@ func (RV *RevengeRoot) Commence() {
 	RV.server.Res.Logger.Fatal(RV.server.Res.Start(":" + RV.server.port))
 }
 
-func Web_Socket() interface{} {
-
-}
-
 func test_handler(c echo.Context) error {
 	//performing db operations - chanign the state of DB
 	new_entry := "Hello World" // new entry
@@ -110,6 +106,9 @@ func test_handler(c echo.Context) error {
 	UR.SendUpdates(1, 1, msg)
 
 	return c.JSON(http.StatusOK, new_entry)
+}
+func Web_Socket() interface{} {
+
 }
 
 func SSEhandler(c echo.Context) error {

@@ -1,0 +1,13 @@
+{
+#these are the different services which are deployed seperately
+#provide PIP - [public IP s] defenelty
+  "service_user_management": {
+  "pip" : "168.123.45.6",
+    "users":[],
+    ""
+  },
+
+  "service_cart_handler" : {
+  "pip" : ""
+  }
+}
